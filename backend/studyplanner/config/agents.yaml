@@ -1,0 +1,15 @@
+planner:
+  model: "models/gemini-flash-latest"
+  temperature: 0.2
+
+scheduler:
+  model: "models/gemini-flash-latest"
+  temperature: 0.1
+
+resources:
+  model: "models/gemini-flash-latest"
+  temperature: 0.2
+
+motivator:
+  model: "models/gemini-flash-latest"
+  temperature: 0.5

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Planner</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1: #fcf7ff;
+      --bg2: #fffaf0;
+      --accent1: #c7f9cc;
+      --accent2: #ffd6e0;
+      --muted: #6b6b6b;
+      --card: rgba(255,255,255,0.78);
+      --glass: rgba(255,255,255,0.62);
+      --shadow: 0 10px 30px rgba(99,102,241,0.06);
+      --radius: 14px;
+      --accent-strong: #6f42c1;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    html,body{height:100%;margin:0;background:linear-gradient(135deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased;}
+    .wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:28px;padding:44px 16px 80px;}
+
+    header{width:100%;max-width:1100px;text-align:center}
+    h1{
+      margin:0;font-size:44px;font-weight:800;color:var(--accent-strong);letter-spacing:0.2px;
+      background:linear-gradient(90deg,#6f42c1 0%, #f472b6 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      text-transform:capitalize;
+    }
+    p.lead{margin:10px 0 0;color:var(--muted);font-size:15px}
+
+    .main{width:100%;max-width:1100px;display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start;}
+
+    .panel{background:var(--card);backdrop-filter: blur(6px);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+    .input-area{display:flex;flex-direction:column;gap:12px}
+    label.muted{font-size:13px;color:var(--muted)}
+    textarea{width:100%;min-height:120px;border-radius:12px;border:1px solid rgba(0,0,0,0.06);padding:14px;font-size:15px;resize:vertical;outline:none}
+    .controls{display:flex;gap:12px;align-items:center;margin-top:6px}
+    .btn{background:var(--accent-strong);color:white;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 14px rgba(111,66,193,0.08)}
+    .btn.secondary{background:transparent;color:var(--accent-strong);border:1px solid rgba(111,66,193,0.12);font-weight:600}
+    .small{font-size:13px;padding:8px 10px;border-radius:8px}
+    .muted{color:var(--muted);font-size:13px}
+
+    .results{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+
+    .card{background:var(--glass);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.62);display:flex;flex-direction:column;gap:8px}
+    .card .meta{display:flex;align-items:center;gap:10px;justify-content:space-between}
+    .card h3{margin:0;font-size:15px;color:#3b3054}
+    .card .actions{display:flex;gap:8px}
+    .card button.action{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:6px 8px;border-radius:8px;cursor:pointer;font-size:13px}
+    .card .content{font-size:14px;color:#222;line-height:1.45;white-space:pre-wrap;word-break:break-word;padding-top:4px}
+
+    .sidebar{display:flex;flex-direction:column;gap:14px}
+    .card.small{padding:12px}
+    .card pre{white-space:pre-wrap;margin:0;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;font-size:13px;color:#333}
+
+    .footer{width:100%;max-width:1100px;text-align:center;color:var(--muted);font-size:13px;margin-top:6px}
+
+    @media (max-width:940px){ .main{grid-template-columns:1fr;} .sidebar{order:2} }
+
+    .decor{position:absolute;pointer-events:none;filter:blur(36px);opacity:0.55;width:420px;height:420px;border-radius:50%;z-index:-1}
+    .decor.one{background:radial-gradient(circle at 30% 30%, rgba(199,249,204,0.9), rgba(199,249,204,0.35));left:-120px;top:-60px}
+    .decor.two{background:radial-gradient(circle at 70% 70%, rgba(255,214,224,0.9), rgba(255,214,224,0.3));right:-100px;bottom:-80px}
+
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid rgba(0,0,0,0.08);border-top-color:var(--accent-strong);animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .controls-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .tiny{font-size:12px;color:var(--muted)}
+    .action-bar{display:flex;gap:8px;align-items:center;margin-top:6px}
+    .notice{font-size:13px;color:#4b5563}
+  </style>
+</head>
+<body>
+  <div class="decor one"></div>
+  <div class="decor two"></div>
+
+  <div class="wrap">
+    <header>
+      <h1>Study Planner</h1>
+      <p class="lead">Personalized plans, schedules, resources & motivation </p>
+    </header>
+
+    <div class="main">
+      <div class="panel">
+        <div class="input-area">
+          <label class="muted">Tell me what you need help studying (example: <em>"CS exam in 10 days, 4 hours total"</em>)</label>
+          <textarea id="user-input" placeholder="Describe your goals, time available, deadlines...">CS exam in 10 days, 4 hours total</textarea>
+
+          <div class="controls">
+            <button id="run-btn" class="btn">Generate Plan</button>
+            <button id="clear-btn" class="btn secondary small">Clear</button>
+
+            <div class="controls-right">
+              <label class="tiny">Max tokens</label>
+              <input id="tokens" type="number" value="2048" min="256" max="4096" style="width:110px;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);">
+              <div id="status" class="muted small">Ready</div>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <div class="notice">Pro tip: be specific about exam date, hours/day & topics for a better plan.</div>
+          </div>
+        </div>
+
+        <div class="results" id="results">
+          <!-- result cards inserted here -->
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="card small">
+          <h3 style="font-size:15px;margin-bottom:6px">How it works</h3>
+          <pre style="margin:0;font-size:13px">Enter constraints → Generate Plan → Planner, Schedule, Resources & Motivator get created by the model.</pre>
+        </div>
+
+        <div class="card small">
+          <h3 style="font-size:15px;margin-bottom:6px">Output preview</h3>
+          <pre id="preview" style="margin:0">Planner • Schedule • Resources • Motivator</pre>
+        </div>
+
+        <div class="card small">
+          <h3 style="font-size:15px;margin-bottom:6px">Quick actions</h3>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button id="copy-all" class="btn secondary small">Copy All</button>
+            <button id="download-all" class="btn secondary small">Download All (.txt)</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer">Made with pastel vibes • Study Planner</div>
+  </div>
+
+  <script>
+    const runBtn = document.getElementById('run-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const status = document.getElementById('status');
+    const results = document.getElementById('results');
+    const preview = document.getElementById('preview');
+    const tokensInput = document.getElementById('tokens');
+    const copyAllBtn = document.getElementById('copy-all');
+    const downloadAllBtn = document.getElementById('download-all');
+
+    function shortStatus(text, busy=false){
+      if(busy) {
+        status.innerHTML = '<span class="spinner"></span> ' + text;
+      } else {
+        status.textContent = text;
+      }
+    }
+
+    function sanitizeAndRender(text){
+      if(!text) return '';
+      // simple transformations:
+      // 1) convert markdown headings "## " to <h4>
+      // 2) convert **bold** to <strong>
+      // 3) convert URLs to anchors
+      // 4) preserve line breaks
+      let out = text;
+
+      // escape HTML to avoid injection (basic)
+      out = out.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
+      // headings
+      out = out.replace(/^##\s?(.*)$/gm, '<h4 style="margin:6px 0 8px;color:#3b3054;font-size:15px">$1</h4>');
+      // bold
+      out = out.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // links (http(s)://...)
+      out = out.replace(/(https?:\/\/[^\s)]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+      // simple bullets -> <li>
+      // preserve tables and code blocks inside <pre>, fallback to br
+      // Convert double newlines into paragraph breaks
+      out = out.replace(/\r\n/g, '\n');
+      // convert remaining single newlines to <br> for readability
+      out = out.replace(/([^\n])\n(?!\n)/g, '$1<br>');
+      return out;
+    }
+
+    function createCard(title, rawText){
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = title;
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'action';
+      copyBtn.textContent = 'Copy';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(rawText).then(()=> {
+          shortStatus('Copied');
+          setTimeout(()=> shortStatus('Ready'),1200);
+        });
+      };
+
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className = 'action';
+      downloadBtn.textContent = 'Save';
+      downloadBtn.onclick = () => {
+        const blob = new Blob([rawText], {type: 'text/plain;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title.replace(/\s+/g,'_')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      };
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'action';
+      toggleBtn.textContent = 'Pretty';
+      let prettyOn = true;
+
+      actions.appendChild(copyBtn);
+      actions.appendChild(downloadBtn);
+      actions.appendChild(toggleBtn);
+
+      meta.appendChild(h3);
+      meta.appendChild(actions);
+
+      const content = document.createElement('div');
+      content.className = 'content';
+      content.innerHTML = sanitizeAndRender(rawText);
+
+      toggleBtn.onclick = () => {
+        prettyOn = !prettyOn;
+        toggleBtn.textContent = prettyOn ? 'Pretty' : 'Raw';
+        content.innerHTML = prettyOn ? sanitizeAndRender(rawText) : ('<pre style="white-space:pre-wrap;margin:0;font-family:ui-monospace, monospace;">' + escapeHtml(rawText) + '</pre>');
+      };
+
+      card.appendChild(meta);
+      card.appendChild(content);
+      return card;
+    }
+
+    function escapeHtml(s){
+      return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    clearBtn.addEventListener('click', ()=>{
+      document.getElementById('user-input').value='';
+      results.innerHTML='';
+      preview.textContent = 'Planner • Schedule • Resources • Motivator';
+      shortStatus('Cleared');
+    });
+
+    copyAllBtn.addEventListener('click', async ()=>{
+      const texts = Array.from(results.querySelectorAll('.content')).map(c=> c.innerText).join('\n\n---\n\n');
+      if(!texts){ shortStatus('Nothing to copy'); return; }
+      await navigator.clipboard.writeText(texts);
+      shortStatus('All copied');
+      setTimeout(()=> shortStatus('Ready'),1200);
+    });
+
+    downloadAllBtn.addEventListener('click', ()=>{
+      const texts = Array.from(results.querySelectorAll('.content')).map(c=> c.innerText).join('\n\n---\n\n');
+      if(!texts){ shortStatus('Nothing to download'); return; }
+      const blob = new Blob([texts], {type: 'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `study_plan_all.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      shortStatus('Downloaded');
+      setTimeout(()=> shortStatus('Ready'),1200);
+    });
+
+    runBtn.addEventListener('click', async ()=>{
+      const message = document.getElementById('user-input').value.trim();
+      if(!message){ shortStatus('Please add a prompt'); return; }
+
+      shortStatus('Working...', true);
+      results.innerHTML = '';
+      preview.textContent = 'Generating...';
+
+      try{
+        const resp = await fetch('/run_session', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            message,
+            user_id: "",
+            location: "",
+            consent_save: false,
+            max_output_tokens: Number(tokensInput.value) || 2048
+          })
+        });
+
+        const data = await resp.json();
+        if(resp.status !== 200){
+          shortStatus('Server error');
+          preview.textContent = JSON.stringify(data, null, 2);
+          return;
+        }
+
+        // clear and add cards
+        results.innerHTML = '';
+        const plannerText = data.planner?.raw ?? JSON.stringify(data.planner);
+        const scheduleText = data.schedule?.raw ?? JSON.stringify(data.schedule);
+        const resourcesText = data.resources?.raw ?? JSON.stringify(data.resources);
+        const motivatorText = data.motivator?.raw ?? JSON.stringify(data.motivator);
+
+        results.appendChild(createCard('Planner', plannerText));
+        results.appendChild(createCard('Schedule', scheduleText));
+        results.appendChild(createCard('Resources', resourcesText));
+        results.appendChild(createCard('Motivator', motivatorText));
+
+        preview.textContent = 'Done — check the cards on the left.';
+        shortStatus('Ready');
+      }catch(err){
+        console.error(err);
+        shortStatus('Fetch error');
+        preview.textContent = String(err);
+      }
+    });
+
+    // on load: small animation/status
+    document.addEventListener('DOMContentLoaded', ()=> shortStatus('Ready'));
+  </script>
+</body>
+</html>

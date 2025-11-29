@@ -1,0 +1,11 @@
+plan:
+  description: "Create a personalized study plan based on user goals, time availability, and deadlines. Include daily objectives, estimated durations, and priorities."
+
+schedule:
+  description: "Turn the study plan into a 7-day schedule with time blocks, break times, and suggested order."
+
+resources:
+  description: "Recommend 3 learning resources (free/paid) with short reasons why each fits the user's goals."
+
+motivate:
+  description: "Short motivational message and 3 practical focus tips to help the user start and stick to the plan."
