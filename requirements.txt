@@ -1,4 +1,6 @@
+google-genai
 fastapi
-requests
-python-dotenv
 uvicorn
+python-dotenv
+pyyaml
+requests
