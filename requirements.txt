@@ -1,6 +1,9 @@
-google-genai
 fastapi
 uvicorn
-python-dotenv
-pyyaml
 requests
+python-dotenv
+transformers
+torch
+Pillow
+matplotlib
+google-generativeai
